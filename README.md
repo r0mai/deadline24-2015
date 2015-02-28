@@ -12,4 +12,5 @@ mkdir task-x
 mkdir build
 cd build
 cmake .. [-GNinja]
+make/ninja whatever
 ```
