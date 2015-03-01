@@ -1,37 +1,39 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <iterator>
 
 using maxt = unsigned __int128;
+using data = std::uintmax_t;
 
-std::vector<maxt> map{0,1,1};
-std::vector<maxt> sum{0,1,2};
+std::vector<data> map{0,1,1};
+std::vector<data> sum{0,1,2};
 
-maxt mod;
-maxt c;
+data mod;
+data c;
 
-maxt get(maxt n)
+data get(data n)
 {
-    if(sum.size() < n)
+    if(sum.size() > n)
         return sum[n];
 
-    map.reserve(n+1);
-    sum.reserve(n+1);
+    ++n;
+    map.reserve(n);
+    sum.reserve(n);
 
-    auto reservedEnd = map.begin() + map.capacity();
-    for(auto it = map.end(), it2 = sum.end(); it != reservedEnd; ++it, ++it2)
+    for(auto it = map.end(), it2 = sum.end(); map.size() != n; ++it, ++it2)
     {
-        map.insert(it, (c * it[-1] + it[-2]) % mod );
-        sum.insert(it2, (it2[-1] + *it) % mod );
+        map.insert(it, (static_cast<maxt>(c) * it[-1] + it[-2]) % mod );
+        sum.insert(it2, (static_cast<maxt>(it2[-1]) + *it) % mod );
     }
     return sum.back();
 }
 
 int main()
 {
-    maxt t;
+    data t;
     std::cin >> c >> mod >> t;
-    for(maxt i = 0; i < t ; ++i)
-        std::cout << get( *std::istream_iterator<maxt>(std::cin) ) << std::endl;
+    for(data i = 0; i < t ; ++i)
+        std::cout << get( *std::istream_iterator<data>(std::cin) ) << std::endl;
 }
 
