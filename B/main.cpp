@@ -8,8 +8,8 @@ struct InspectionWindow {
     std::size_t end;
 
     bool operator<(const InspectionWindow& rhs) const {
-        if (end < rhs.end) {
-            return true;
+        if (end != rhs.end) {
+            return end < rhs.end;
         }
         return start < rhs.start;
     }
@@ -66,7 +66,7 @@ int main() {
         std::vector<InspectionWindow> secondInspection;
         if (!remaining.empty()) {
             secondInspection.push_back(remaining.front());
-            for (auto it = patrols.begin(); it != patrols.end(); ++it) {
+            for (auto it = remaining.begin() + 1; it != remaining.end(); ++it) {
                 if (secondInspection.back().end <= it->start) {
                     secondInspection.push_back(*it);
                 }
@@ -77,6 +77,17 @@ int main() {
 
         std::cout << firstInspection.size() + secondInspection.size()
                   << std::endl;
+
+        std::cout << "decisions: " << std::endl;
+
+        for (auto& ins : firstInspection) {
+            std::cout << ins << std::endl;
+        }
+        std::cout << "-----------" << std::endl;
+        for (auto& ins : secondInspection) {
+            std::cout << ins << std::endl;
+        }
+        std::cout << "===========" << std::endl;
 
     } // for testcase
 } // main
