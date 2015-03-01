@@ -6,12 +6,14 @@
 #include <deque>
 #include <map>
 #include <algorithm>
+#include <array>
 
 using maxt = unsigned __int128;
 using data = std::uintmax_t;
 
-std::deque<data> map{0,1,1};
-std::deque<data> sum{0,1,2};
+std::array< data, 3 > map{0,1,1};
+std::array< data, 3 > sum{0,1,2};
+
 
 data mod;
 data c;
@@ -24,13 +26,13 @@ data get(data n)
         if(hol % 1000000000 == 0)
             std::cerr << "itt:"<< hol << std::endl;
 
-        map.pop_front();
-        sum.pop_front();
-        map.push_back((static_cast<maxt>(c) * map.back() + map.front()) % mod);
-        sum.push_back((static_cast<maxt>(sum.back()) + map.back()) % mod);
+        std::copy(map.begin()+1,map.end(), map.begin());
+        std::copy(sum.begin()+1,sum.end(), sum.begin());
+        map.back() = (static_cast<maxt>(c) * map.back() + map.front()) % mod;
+        sum.back() = (static_cast<maxt>(sum.back()) + map.back()) % mod;
         ++hol;
     }
-    return *sum.begin();
+    return sum[0];
 }
 
 int main()
