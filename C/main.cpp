@@ -19,6 +19,11 @@ struct building {
     int y = -1;
 };
 
+struct construction {
+    building house;
+    building garden;
+};
+
 field_t char_to_field(char ch) {
     switch (ch) {
         case 'X': return TREE;
@@ -37,7 +42,7 @@ char field_to_char(field_t f) {
     }
 }
 
-int score(const field_matrix& field, const building& b, bool garden = false) {
+int score(const field_matrix& field, const building& b) {
     assert(b.shape >= 0);
     assert(b.rotation >= 0);
     const auto& shape = shapes[b.shape][b.rotation];
@@ -73,11 +78,7 @@ int score(const field_matrix& field, const building& b, bool garden = false) {
             case INACCESSIBLE:
                 return -105;
             case TREE:
-                if (garden) {
-                    score += 2;
-                } else {
-                    score -= 2;
-                }
+                score += 2;
                 break;
             case EMPTY:
             default:
@@ -86,6 +87,70 @@ int score(const field_matrix& field, const building& b, bool garden = false) {
         }
     }
     return score;
+}
+
+bool has_common_side(const building& a, const building& b) {
+    const auto& ashape = shapes[a.shape][a.rotation];
+    unsigned aox, aoy;
+    std::tie(aox, aoy) = get_origin(ashape);
+
+    const auto& bshape = shapes[b.shape][b.rotation];
+    unsigned box, boy;
+    std::tie(box, boy) = get_origin(bshape);
+
+    char_matrix field(220, std::vector<char>(220, ' '));
+
+    unsigned asw = ashape[0].size();
+    unsigned ash = ashape.size();
+
+    unsigned bsw = bshape[0].size();
+    unsigned bsh = bshape.size();
+
+    for (unsigned asx = 0; asx < asw; ++asx) {
+        for (unsigned asy = 0; asy < ash; ++asy) {
+            if (ashape[asy][asx] != ' ') {
+                field[aoy + asy][aox + asx] = '1';
+            }
+        }
+    }
+    for (unsigned bsx = 0; bsx < bsw; ++bsx) {
+        for (unsigned bsy = 0; bsy < bsh; ++bsy) {
+            if (ashape[bsy][bsx] != ' ') {
+                if (field[boy + bsy][box + bsx] == '1') {
+                    assert(false && "overlap");
+                }
+                field[boy + bsy][box + bsx] = '2';
+                if (boy + bsy > 0 && field[boy + bsy - 1][box + bsx] == '1') {
+                    return true;
+                }
+                if (box + bsx > 0 && field[boy + bsy][box + bsx - 1] == '1') {
+                    return true;
+                }
+                if (field[boy + bsy + 1][box + bsx] == '1') {
+                    return true;
+                }
+                if (field[boy + bsy][box + bsx + 1] == '1') {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+int score(const field_t& field, const construction& c) {
+    int house_score = score(field, c.house);
+    int garden_score = score(field, c.garden);
+
+    if (house_score < 0 || garden_score < 0) {
+        return -101;
+    }
+
+    if (!has_common_side(c.house, c.garden)) {
+        return -102;
+    }
+
+    return -house_score + garden_score;
 }
 
 void do_it() {
