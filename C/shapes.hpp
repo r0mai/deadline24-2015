@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <array>
+#include <tuple>
 #include <iostream>
 
 template<class T>
@@ -122,3 +123,15 @@ shapes_t generate_shapes() {
 }
 
 const shapes_t shapes = generate_shapes();
+
+std::tuple<unsigned, unsigned> get_origin(const char_matrix& s) {
+    for (unsigned y = 0; y < s.size(); ++y) {
+        for (unsigned x = 0; x < s[y].size(); ++x) {
+            if (s[y][x] == 'O') {
+                return std::make_tuple(x, y);
+            }
+        }
+    }
+    assert(false);
+    return std::make_tuple(0, 0);
+}
