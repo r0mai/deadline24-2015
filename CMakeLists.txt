@@ -25,7 +25,7 @@ find_package(Boost COMPONENTS
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -O2")
 
 subdirlist(SUBDIRS ${CMAKE_SOURCE_DIR})
 foreach(SUBDIR ${SUBDIRS})
