@@ -3,8 +3,20 @@
 #include <cassert>
 #include <iostream>
 
+#include "shapes.hpp"
+
 enum field_t {
     TREE, EMPTY, INACCESSIBLE
+};
+
+using field_matrix = matrix<field_t>;
+
+// garden or house
+struct building {
+    int shape = -1;
+    int rotation = -1;
+    int x = -1;
+    int y = -1;
 };
 
 field_t char_to_field(char ch) {
@@ -25,11 +37,9 @@ char field_to_char(field_t f) {
     }
 }
 
-template<class T>
-using matrix = std::vector<std::vector<T>>;
+int score(const field_matrix& field, const building& b) {
 
-using field_matrix = matrix<field_t>;
-
+}
 
 void do_it() {
     int n, m;
@@ -59,5 +69,11 @@ int main() {
     std::cin >> t;
     for (int i = 0; i < t; ++i) {
         do_it();
+    }
+    for (const auto& sp : shapes) {
+        for (const auto& s : sp) {
+            std::cout << "-------------" << std::endl;
+            print_shape(s);
+        }
     }
 }
