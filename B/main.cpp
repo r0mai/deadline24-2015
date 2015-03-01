@@ -4,8 +4,8 @@
 #include <cstddef>
 
 struct InspectionWindow {
-    std::size_t start;
-    std::size_t end;
+    std::intmax_t start;
+    std::intmax_t end;
 
     bool operator<(const InspectionWindow& rhs) const {
         if (end != rhs.end) {
@@ -47,21 +47,22 @@ int main() {
         // impl begin
         std::sort(patrols.begin(), patrols.end());
 
-        // first inspection
         std::vector<InspectionWindow> firstInspection;
         std::vector<InspectionWindow> secondInspection;
-        InspectionWindow dummy{0, 0};
-        firstInspection.push_back(dummy);
-        secondInspection.push_back(dummy);
+        std::intmax_t largeValue = std::numeric_limits<std::intmax_t>::max();
         for (auto it = patrols.begin(); it != patrols.end(); ++it) {
-            auto end1 = firstInspection.back().end;
-            auto end2 = secondInspection.back().end;
-            if (it->start < std::min(end1, end2)) {
-                continue;
-            }
+            std::intmax_t deltaTo1 = [&]() {
+                if (firstInspection.empty())
+                    return largeValue;
+                return it->start - firstInspection.back().end;
+            }();
 
-            int deltaTo1 = it->start - end1;
-            int deltaTo2 = it->start - end2;
+            std::intmax_t deltaTo2 = [&]() {
+                if (secondInspection.empty()) {
+                    return largeValue;
+                }
+                return it->start - secondInspection.back().end;
+            }();
 
             if (deltaTo1 >= 0 && deltaTo2 >= 0) {
                 if (deltaTo1 < deltaTo2) {
@@ -82,9 +83,6 @@ int main() {
             }
         }
 
-        firstInspection.erase(firstInspection.begin());
-        secondInspection.erase(secondInspection.begin());
-
         // impl end
 
         std::cout << firstInspection.size() + secondInspection.size()
@@ -92,12 +90,12 @@ int main() {
 
         std::cerr << "decisions: " << std::endl;
 
-        for (auto& ins : firstInspection) {
-            std::cerr << ins << std::endl;
+        for (auto& inspection : firstInspection) {
+            std::cerr << inspection << std::endl;
         }
         std::cerr << "-----------" << std::endl;
-        for (auto& ins : secondInspection) {
-            std::cerr << ins << std::endl;
+        for (auto& inspection : secondInspection) {
+            std::cerr << inspection << std::endl;
         }
         std::cerr << "===========" << std::endl;
 
