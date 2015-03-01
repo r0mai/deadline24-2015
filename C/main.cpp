@@ -37,7 +37,7 @@ char field_to_char(field_t f) {
     }
 }
 
-int score(const field_matrix& field, const building& b) {
+int score(const field_matrix& field, const building& b, bool garden = false) {
     assert(b.shape >= 0);
     assert(b.rotation >= 0);
     const auto& shape = shapes[b.shape][b.rotation];
@@ -51,17 +51,41 @@ int score(const field_matrix& field, const building& b) {
     unsigned sh = shape.size();
 
     if (b.x < ox) {
-        return -1;
+        return -101;
     }
     if (b.y < oy) {
-        return -2;
+        return -102;
     }
-    if (b.x + (sw - ox - 1) < fw) {
-        return -3;
+    if (b.x + (sw - ox - 1) >= fw) {
+        return -103;
     }
-    if (b.y + (sh - oy - 1) < fh) {
-        return -4;
+    if (b.y + (sh - oy - 1) >= fh) {
+        return -104;
     }
+
+    int score = 0;
+    for (unsigned sx = 0; sx < sw; ++sx) {
+        for (unsigned sy = 0; sy < sh; ++sy) {
+            if (shape[sy][sx] == ' ') {
+                continue;
+            }
+            switch (field[oy + sy][ox + ox]) {
+            case INACCESSIBLE:
+                return -105;
+            case TREE:
+                if (garden) {
+                    score += 2;
+                } else {
+                    score -= 2;
+                }
+                break;
+            case EMPTY:
+            default:
+                break;
+            }
+        }
+    }
+    return score;
 }
 
 void do_it() {
@@ -85,6 +109,17 @@ void do_it() {
         }
         std::cout << std::endl;
     }
+    building b;
+    b.shape = 0;
+    b.rotation = 0;
+    for (int y = 0; y < m; ++y) {
+        for (int x = 0; x < n; ++x) {
+            b.x = x;
+            b.y = y;
+            std::cout << b.x << " " << b.y << " ";
+            std::cout << score(field, b) << std::endl;
+        }
+    }
 }
 
 int main() {
@@ -93,10 +128,10 @@ int main() {
     for (int i = 0; i < t; ++i) {
         do_it();
     }
-    for (const auto& sp : shapes) {
-        for (const auto& s : sp) {
-            std::cout << "-------------" << std::endl;
-            print_shape(s);
-        }
-    }
+//    for (const auto& sp : shapes) {
+//        for (const auto& s : sp) {
+//            std::cout << "-------------" << std::endl;
+//            print_shape(s);
+//        }
+//    }
 }
