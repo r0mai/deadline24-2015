@@ -3,15 +3,15 @@
 #include <valarray>
 #include <iterator>
 #include <vector>
-#include <list>
+#include <deque>
 #include <map>
 #include <algorithm>
 
 using maxt = unsigned __int128;
 using data = std::uintmax_t;
 
-std::list<data> map{0,1,1};
-std::list<data> sum{0,1,2};
+std::deque<data> map{0,1,1};
+std::deque<data> sum{0,1,2};
 
 data mod;
 data c;
@@ -21,13 +21,13 @@ data get(data n)
     std::cerr << "get:" << n << std::endl;
     while(hol < n)
     {
-        if(hol % 100000000 == 0)
+        if(hol % 1000000000 == 0)
             std::cerr << "itt:"<< hol << std::endl;
 
-        map.erase(map.begin());
-        sum.erase(sum.begin());
-        map.insert(map.end(), (static_cast<maxt>(c) * *map.rbegin() + *map.begin()) % mod);
-        sum.insert(sum.end(), (static_cast<maxt>(*sum.rbegin()) + *map.rbegin()) % mod);
+        map.pop_front();
+        sum.pop_front();
+        map.push_back((static_cast<maxt>(c) * map.back() + map.front()) % mod);
+        sum.push_back((static_cast<maxt>(sum.back()) + map.back()) % mod);
         ++hol;
     }
     return *sum.begin();
