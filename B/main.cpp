@@ -49,45 +49,57 @@ int main() {
 
         // first inspection
         std::vector<InspectionWindow> firstInspection;
-        firstInspection.push_back(patrols.front());
-        for (auto it = patrols.begin() + 1; it != patrols.end(); ++it) {
-            if (firstInspection.back().end <= it->start) {
-                firstInspection.push_back(*it);
-            }
-        }
-
-        std::vector<InspectionWindow> remaining;
-        std::set_difference(patrols.begin(),
-                            patrols.end(),
-                            firstInspection.begin(),
-                            firstInspection.end(),
-                            std::back_inserter(remaining));
-
         std::vector<InspectionWindow> secondInspection;
-        if (!remaining.empty()) {
-            secondInspection.push_back(remaining.front());
-            for (auto it = remaining.begin() + 1; it != remaining.end(); ++it) {
-                if (secondInspection.back().end <= it->start) {
+        InspectionWindow dummy{0, 0};
+        firstInspection.push_back(dummy);
+        secondInspection.push_back(dummy);
+        for (auto it = patrols.begin(); it != patrols.end(); ++it) {
+            auto end1 = firstInspection.back().end;
+            auto end2 = secondInspection.back().end;
+            if (it->start < std::min(end1, end2)) {
+                continue;
+            }
+
+            int deltaTo1 = it->start - end1;
+            int deltaTo2 = it->start - end2;
+
+            if (deltaTo1 >= 0 && deltaTo2 >= 0) {
+                if (deltaTo1 < deltaTo2) {
+                    firstInspection.push_back(*it);
+                    continue;
+                } else {
                     secondInspection.push_back(*it);
+                    continue;
                 }
             }
+            if (deltaTo1 >= 0) {
+                firstInspection.push_back(*it);
+                continue;
+            }
+            if (deltaTo2 >= 0) {
+                secondInspection.push_back(*it);
+                continue;
+            }
         }
+
+        firstInspection.erase(firstInspection.begin());
+        secondInspection.erase(secondInspection.begin());
 
         // impl end
 
         std::cout << firstInspection.size() + secondInspection.size()
                   << std::endl;
 
-        std::cout << "decisions: " << std::endl;
+        std::cerr << "decisions: " << std::endl;
 
         for (auto& ins : firstInspection) {
-            std::cout << ins << std::endl;
+            std::cerr << ins << std::endl;
         }
-        std::cout << "-----------" << std::endl;
+        std::cerr << "-----------" << std::endl;
         for (auto& ins : secondInspection) {
-            std::cout << ins << std::endl;
+            std::cerr << ins << std::endl;
         }
-        std::cout << "===========" << std::endl;
+        std::cerr << "===========" << std::endl;
 
     } // for testcase
 } // main
